@@ -1,52 +1,41 @@
-function Modal({
-  newItem,
-  setNewItem,
-  handleSubmit,
-  onConfirm,
-  onCancel,
-  addItem,
-}) {
+import { useRef } from "react";
+
+function Modal({ onConfirm, onCancel, saveDepartment }) {
+  const DepNameRef = useRef();
+
   function cancelHandler() {
     onCancel();
   }
 
-  function confirmHandler() {
-    if (!newItem) return;
-    console.log(newItem);
-    setNewItem("");
-    addItem(newItem);
+  function submitHandler(e) {
+    e.preventDefault();
+    if (!DepNameRef.current.value) return;
+
+    saveDepartment(DepNameRef.current.value);
     onConfirm();
   }
 
   return (
-    <form className="addForm" onSubmit={handleSubmit}>
-      <div className="modal">
-        <h1>Add New Item</h1>
+    <form className="addForm" onSubmit={submitHandler}>
+      <div className="modal2">
+        <h1>Add New Department</h1>
         <div className="ItemForm">
-          <label htmlFor="addItem">Add Item</label>
+          <label htmlFor="addDep">Add Department</label>
           <input
             autoFocus
-            id="addItem"
+            id="addDep"
             type="text"
-            placeholder="Add New Item"
+            placeholder="Department Name"
             required
-            value={newItem}
-            onChange={(e) => {
-              setNewItem(e.target.value);
-            }}
+            ref={DepNameRef}
           ></input>
         </div>
 
         <button className="btn btn--alt" onClick={cancelHandler}>
           Cancel
         </button>
-        <button
-          type="submit"
-          aria-label="Add Item"
-          className="btn"
-          onClick={confirmHandler}
-        >
-          Add Item
+        <button type="submit" aria-label="Add Department" className="btn">
+          Add Department
         </button>
       </div>
     </form>

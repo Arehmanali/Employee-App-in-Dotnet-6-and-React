@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import AddDepartment from "./AddDepartment";
 
 const Department = () => {
-  const [forecasts, setForecasts] = useState("");
+  const [departments, setDepartments] = useState([]);
+  const [addNew, setAddNew] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,11 +20,23 @@ const Department = () => {
       })
       .then((data) => {
         setLoading(false);
-        setForecasts(data);
+        setDepartments(data);
       });
-  }, []);
+  }, [addNew]);
 
-  const renderForecastsTable = (forecasts) => {
+  const saveDepartment = (depName) => {
+    fetch("departments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        departmentName: depName,
+      }),
+    }).then(() => setAddNew(!addNew));
+  };
+
+  const renderForecastsTable = (departments) => {
     return (
       <table className="table table-striped" aria-labelledby="tabelLabel">
         <thead>
@@ -32,10 +46,10 @@ const Department = () => {
           </tr>
         </thead>
         <tbody>
-          {forecasts.map((forecast) => (
-            <tr key={forecast.departmentId}>
-              <td>{forecast.departmentId}</td>
-              <td>{forecast.departmentName}</td>
+          {departments.map((dep) => (
+            <tr key={dep.departmentId}>
+              <td>{dep.departmentId}</td>
+              <td>{dep.departmentName}</td>
             </tr>
           ))}
         </tbody>
@@ -48,14 +62,13 @@ const Department = () => {
       <em>Loading...</em>
     </p>
   ) : (
-    renderForecastsTable(forecasts)
+    renderForecastsTable(departments)
   );
 
   return (
     <div>
       <h1 id="tabelLabel">Departments</h1>
-      <button>Add Department</button>
-      <p>This component demonstrates fetching data from the server.</p>
+      <AddDepartment saveDepartment={saveDepartment} />
       {contents}
     </div>
   );

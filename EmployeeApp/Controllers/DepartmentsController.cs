@@ -23,7 +23,7 @@ namespace EmployeeApp.Controllers
             {
                 return NotFound();
             }
-            return await _context.Departments.ToListAsync();
+            return await _context.Departments.OrderBy(o => o.departmentId).ToListAsync();
         }
 
         // GET: api/Departments/5

@@ -24,7 +24,8 @@ namespace EmployeeApp.Controllers
             {
                 return NotFound();
             }
-            return await _context.Employees.ToListAsync();
+
+            return await _context.Employees.ToListAsync(); ;
         }
 
         // GET: api/Employees/5

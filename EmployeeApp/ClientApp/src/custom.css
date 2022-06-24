@@ -19,10 +19,6 @@ code {
   box-sizing: border-box;
 }
 
-html {
-  font-size: 22px;
-}
-
 body {
   min-height: 100vh;
   font-family: "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
@@ -47,6 +43,18 @@ body {
 }
 
 .addForm input[type="text"] {
+  flex-grow: 1;
+  width: 75%;
+  max-width: calc(100% - 50px);
+  min-height: 48px;
+  font-size: 1rem;
+  padding: 0.25rem;
+  margin-top: 20px;
+  border-radius: 0.25rem;
+  outline: none;
+}
+
+.addForm input[type="date"] {
   flex-grow: 1;
   width: 75%;
   max-width: calc(100% - 50px);
@@ -156,7 +164,7 @@ h2 {
   text-align: right;
 }
 
-.modal {
+.modal2 {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   border-radius: 6px;
   background-color: white;

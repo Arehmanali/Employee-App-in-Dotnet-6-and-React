@@ -25,7 +25,7 @@ namespace EmployeeApp.Controllers
                 return NotFound();
             }
 
-            return await _context.Employees.ToListAsync(); ;
+            return await _context.Employees.ToListAsync();
         }
 
         // GET: api/Employees/5
@@ -110,6 +110,18 @@ namespace EmployeeApp.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [Route("getDepartments")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
+        {
+            if (_context.Departments == null)
+            {
+                return NotFound();
+            }
+
+            return await _context.Departments.ToListAsync();
         }
 
         private bool EmployeeExists(int id)

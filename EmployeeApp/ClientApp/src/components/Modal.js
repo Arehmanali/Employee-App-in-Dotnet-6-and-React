@@ -1,7 +1,7 @@
-import { useRef } from "react";
+import { useState } from "react";
 
 function Modal({ onConfirm, onCancel, saveDepartment }) {
-  const DepNameRef = useRef();
+  const [depName, setDepName] = useState("");
 
   function cancelHandler() {
     onCancel();
@@ -9,9 +9,8 @@ function Modal({ onConfirm, onCancel, saveDepartment }) {
 
   function submitHandler(e) {
     e.preventDefault();
-    if (!DepNameRef.current.value) return;
-
-    saveDepartment(DepNameRef.current.value);
+    if (!depName) return;
+    saveDepartment(depName);
     onConfirm();
   }
 
@@ -27,7 +26,8 @@ function Modal({ onConfirm, onCancel, saveDepartment }) {
             type="text"
             placeholder="Department Name"
             required
-            ref={DepNameRef}
+            value={depName}
+            onChange={(e) => setDepName(e.target.value)}
           ></input>
         </div>
 

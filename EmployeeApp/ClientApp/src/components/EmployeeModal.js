@@ -1,10 +1,14 @@
-import { useRef } from "react";
+import { useContext, useState } from "react";
+import { AppContext } from "../store/app-context";
+import { Dropdown } from "react-bootstrap";
 
 function EmployeeModal({ onConfirm, onCancel, saveEmployee }) {
-  const employeeNameRef = useRef();
-  const departmentRef = useRef();
-  const dateOfJoiningRef = useRef();
-  const photoFilenameRef = useRef();
+  const appContext = useContext(AppContext);
+
+  const [empName, setEmpName] = useState("");
+  const [dep, setDep] = useState("");
+  const [joinDate, setJoinDate] = useState("");
+  const [photo, setPhoto] = useState("");
 
   function cancelHandler() {
     onCancel();
@@ -14,10 +18,10 @@ function EmployeeModal({ onConfirm, onCancel, saveEmployee }) {
     e.preventDefault();
 
     const newEmployee = {
-      employeeName: employeeNameRef.current.value,
-      department: departmentRef.current.value,
-      dateOfJoining: dateOfJoiningRef.current.value,
-      photoFilename: photoFilenameRef.current.value,
+      employeeName: empName,
+      department: dep,
+      dateOfJoining: joinDate,
+      photoFilename: photo,
     };
 
     saveEmployee(newEmployee);
@@ -36,18 +40,33 @@ function EmployeeModal({ onConfirm, onCancel, saveEmployee }) {
             type="text"
             placeholder="Employee Name"
             required
-            ref={employeeNameRef}
+            value={empName}
+            onChange={(e) => setEmpName(e.target.value)}
           ></input>
         </div>
         <div className="ItemForm">
           <label htmlFor="department">Department</label>
-          <input
-            id="department"
-            type="text"
-            placeholder="Department"
-            required
-            ref={departmentRef}
-          ></input>
+          <Dropdown>
+            <Dropdown.Toggle
+              className="dropdown"
+              variant="success"
+              id="dropdown-basic"
+              required
+              value={dep}
+              onChange={(e) => setDep(e.target.value)}
+            >
+              Department
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {appContext.departments.map((dept) => {
+                return (
+                  <Dropdown.Item href="#/action-1">
+                    {dept.departmentName}
+                  </Dropdown.Item>
+                );
+              })}
+            </Dropdown.Menu>
+          </Dropdown>
         </div>
         <div className="ItemForm">
           <label htmlFor="joiningDate">Joining Date</label>
@@ -56,7 +75,8 @@ function EmployeeModal({ onConfirm, onCancel, saveEmployee }) {
             type="date"
             placeholder="Joining Date"
             required
-            ref={dateOfJoiningRef}
+            value={joinDate}
+            onChange={(e) => setJoinDate(e.target.value)}
           ></input>
         </div>
         <div className="ItemForm">
@@ -66,7 +86,8 @@ function EmployeeModal({ onConfirm, onCancel, saveEmployee }) {
             type="text"
             placeholder="Photo Filename"
             required
-            ref={photoFilenameRef}
+            value={photo}
+            onChange={(e) => setPhoto(e.target.value)}
           ></input>
         </div>
 

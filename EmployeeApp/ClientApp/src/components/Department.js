@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import AddDepartment from "./AddDepartment";
+import { AppContext } from "../store/app-context";
 
 const Department = () => {
+  const appContext = useContext(AppContext);
+
   const [departments, setDepartments] = useState([]);
   const [addNew, setAddNew] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -20,6 +23,8 @@ const Department = () => {
       })
       .then((data) => {
         setLoading(false);
+        appContext.setDepartments(data);
+        console.log(appContext.departments);
         setDepartments(data);
       });
   }, [addNew]);

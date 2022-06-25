@@ -54,6 +54,18 @@ body {
   outline: none;
 }
 
+.dropdown {
+  flex-grow: 1;
+  width: 100%;
+  max-width: calc(100% - 50px);
+  min-height: 48px;
+  font-size: 1rem;
+  padding: 0rem !important;
+  margin-top: 20px;
+  border-radius: 0.25rem;
+  outline: none;
+}
+
 .addForm input[type="date"] {
   flex-grow: 1;
   width: 75%;

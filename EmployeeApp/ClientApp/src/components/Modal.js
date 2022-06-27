@@ -1,16 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-function Modal({ onConfirm, onCancel, saveDepartment }) {
+function Modal({ onConfirm, onCancel, saveDepartment, dep, editDepartment }) {
   const [depName, setDepName] = useState("");
+  const [depId, setDepId] = useState("");
 
   function cancelHandler() {
     onCancel();
   }
 
+  useEffect(() => {
+    if (dep) {
+      setDepId(dep.departmentId);
+      setDepName(dep.departmentName);
+    }
+  }, []);
+
   function submitHandler(e) {
     e.preventDefault();
     if (!depName) return;
-    saveDepartment(depName);
+    if (dep) {
+      const dept = {
+        departmentId: depId,
+        departmentName: depName,
+      };
+
+      editDepartment(dept);
+    } else {
+      saveDepartment(depName);
+    }
     onConfirm();
   }
 
@@ -34,8 +51,12 @@ function Modal({ onConfirm, onCancel, saveDepartment }) {
         <button className="btn btn--alt" onClick={cancelHandler}>
           Cancel
         </button>
-        <button type="submit" aria-label="Add Department" className="btn">
-          Add Department
+        <button
+          type="submit"
+          aria-label="Add Department"
+          className="btn btn--confirm"
+        >
+          {dep ? "Edit Department" : "Add Department"}
         </button>
       </div>
     </form>

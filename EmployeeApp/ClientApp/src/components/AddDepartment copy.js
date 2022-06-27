@@ -1,8 +1,9 @@
 import { useState } from "react";
-import Backdrop from "./Backdrop";
-import EmployeeModal from "./EmployeeModal";
 
-function AddEmployee({ saveEmployee }) {
+import Modal from "./Modal";
+import Backdrop from "./Backdrop";
+
+function AddDepartment({ saveDepartment }) {
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   function submitHandler() {
@@ -12,16 +13,18 @@ function AddEmployee({ saveEmployee }) {
   function closeModalHandler() {
     setModalIsOpen(false);
   }
+
   return (
     <>
       <div className="actions">
         <button className="btn" onClick={submitHandler}>
-          Add Employee
+          Add Department
         </button>
       </div>
+
       {modalIsOpen && (
-        <EmployeeModal
-          saveEmployee={saveEmployee}
+        <Modal
+          saveDepartment={saveDepartment}
           onCancel={closeModalHandler}
           onConfirm={closeModalHandler}
         />
@@ -31,4 +34,4 @@ function AddEmployee({ saveEmployee }) {
   );
 }
 
-export default AddEmployee;
+export default AddDepartment;

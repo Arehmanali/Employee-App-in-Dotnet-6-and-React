@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import AddDepartment from "./AddDepartment";
 import Modal from "./Modal";
 import Backdrop from "./Backdrop";
+import Search from "./Search";
 
 import { AppContext } from "../store/app-context";
 import { FaTrashAlt } from "react-icons/fa";
@@ -14,6 +15,7 @@ const Department = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [alert, setAlert] = useState("");
   const [showAlert, setShowAlert] = useState(false);
+  const [search, setSearch] = useState("");
 
   function submitHandler() {
     setModalIsOpen(true);
@@ -74,33 +76,38 @@ const Department = () => {
             </tr>
           </thead>
           <tbody>
-            {departments.map((dep) => (
-              <tr key={dep.departmentId}>
-                <td>{dep.departmentId}</td>
-                <td>{dep.departmentName}</td>
-                <td>
-                  <FiEdit
-                    role="button"
-                    onClick={() => {
-                      setDep(
-                        departments.find(
-                          (e) => e.departmentId === dep.departmentId
-                        )
-                      );
-                      submitHandler();
-                    }}
-                    tabIndex="0"
-                  />
-                  <FaTrashAlt
-                    role="button"
-                    onClick={() => {
-                      handleDeleteBtn(dep.departmentId);
-                    }}
-                    tabIndex="0"
-                  />
-                </td>
-              </tr>
-            ))}
+            {departments.map(
+              (dep) =>
+                dep.departmentName
+                  .toLowerCase()
+                  .includes(search.toLowerCase()) && (
+                  <tr key={dep.departmentId}>
+                    <td>{dep.departmentId}</td>
+                    <td>{dep.departmentName}</td>
+                    <td>
+                      <FiEdit
+                        role="button"
+                        onClick={() => {
+                          setDep(
+                            departments.find(
+                              (e) => e.departmentId === dep.departmentId
+                            )
+                          );
+                          submitHandler();
+                        }}
+                        tabIndex="0"
+                      />
+                      <FaTrashAlt
+                        role="button"
+                        onClick={() => {
+                          handleDeleteBtn(dep.departmentId);
+                        }}
+                        tabIndex="0"
+                      />
+                    </td>
+                  </tr>
+                )
+            )}
           </tbody>
         </table>
         {modalIsOpen && (
@@ -132,9 +139,22 @@ const Department = () => {
           />
         </div>
       )}
-      <h1 id="tabelLabel">Departments</h1>
-      <AddDepartment saveDepartment={saveDepartment} />
-      {renderForecastsTable(appContext.departments)}
+      <div className="row">
+        <h1 className="col" id="tabelLabel">
+          Departments
+        </h1>
+        <AddDepartment className="col" saveDepartment={saveDepartment} />
+      </div>
+      {appContext.departments.length ? (
+        <>
+          <Search search={search} setSearch={setSearch} />
+          {renderForecastsTable(appContext.departments)}
+        </>
+      ) : (
+        <p style={{ textAlign: "center", color: "darkred" }}>
+          Your department list is empty. Try to add some.
+        </p>
+      )}
     </div>
   );
 };

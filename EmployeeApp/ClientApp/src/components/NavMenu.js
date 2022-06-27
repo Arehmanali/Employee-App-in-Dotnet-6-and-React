@@ -35,18 +35,13 @@ const NavMenu = () => {
         >
           <ul className="navbar-nav flex-grow">
             <NavItem>
-              <NavLink tag={Link} className="text-dark" to="/">
-                Home
+              <NavLink tag={Link} className="text-dark" to="/employee">
+                Employee
               </NavLink>
             </NavItem>
             <NavItem>
               <NavLink tag={Link} className="text-dark" to="/department">
                 Department
-              </NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink tag={Link} className="text-dark" to="/employee">
-                Employee
               </NavLink>
             </NavItem>
           </ul>

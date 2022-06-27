@@ -16,11 +16,9 @@ function AddDepartment({ saveDepartment }) {
 
   return (
     <>
-      <div className="actions">
-        <button className="btn" onClick={submitHandler}>
-          Add Department
-        </button>
-      </div>
+      <button className="btn actions" onClick={submitHandler}>
+        Add Department
+      </button>
 
       {modalIsOpen && (
         <Modal

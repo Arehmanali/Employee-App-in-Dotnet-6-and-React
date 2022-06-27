@@ -99,7 +99,7 @@ button:hover {
 }
 
 .searchForm {
-  width: 100%;
+  width: 30%;
   display: flex;
   justify-content: flex-start;
   margin: 0.25rem 0 0;
@@ -203,6 +203,10 @@ h2 {
   height: 100vh;
   top: 0;
   left: 0;
+}
+
+.table {
+  margin-bottom: 50px;
 }
 
 .table svg {

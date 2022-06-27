@@ -5,6 +5,7 @@ import Backdrop from "./Backdrop";
 import { FaTrashAlt } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 import { ImCross } from "react-icons/im";
+import Search from "./Search";
 
 const Employee = () => {
   const [employees, setEmployees] = useState([]);
@@ -14,6 +15,7 @@ const Employee = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [alert, setAlert] = useState("");
   const [showAlert, setShowAlert] = useState(false);
+  const [search, setSearch] = useState("");
 
   function submitHandler() {
     setModalIsOpen(true);
@@ -89,34 +91,44 @@ const Employee = () => {
             </tr>
           </thead>
           <tbody>
-            {employees.map((emp) => (
-              <tr key={emp.employeeId}>
-                <td>{emp.employeeId}</td>
-                <td>{emp.employeeName}</td>
-                <td>{emp.department}</td>
-                <td>{emp.dateOfJoining.substr(0, 10)}</td>
-                <td>{emp.photoFilename}</td>
-                <td>
-                  <FiEdit
-                    role="button"
-                    onClick={() => {
-                      setEmployee(
-                        employees.find((e) => e.employeeId === emp.employeeId)
-                      );
-                      submitHandler();
-                    }}
-                    tabIndex="0"
-                  />
-                  <FaTrashAlt
-                    role="button"
-                    onClick={() => {
-                      handleDeleteBtn(emp.employeeId);
-                    }}
-                    tabIndex="0"
-                  />
-                </td>
-              </tr>
-            ))}
+            {employees.map(
+              (emp) =>
+                (emp.employeeName
+                  .toLowerCase()
+                  .includes(search.toLowerCase()) ||
+                  emp.department
+                    .toLowerCase()
+                    .includes(search.toLowerCase())) && (
+                  <tr key={emp.employeeId}>
+                    <td>{emp.employeeId}</td>
+                    <td>{emp.employeeName}</td>
+                    <td>{emp.department}</td>
+                    <td>{emp.dateOfJoining.substr(0, 10)}</td>
+                    <td>{emp.photoFilename}</td>
+                    <td>
+                      <FiEdit
+                        role="button"
+                        onClick={() => {
+                          setEmployee(
+                            employees.find(
+                              (e) => e.employeeId === emp.employeeId
+                            )
+                          );
+                          submitHandler();
+                        }}
+                        tabIndex="0"
+                      />
+                      <FaTrashAlt
+                        role="button"
+                        onClick={() => {
+                          handleDeleteBtn(emp.employeeId);
+                        }}
+                        tabIndex="0"
+                      />
+                    </td>
+                  </tr>
+                )
+            )}
           </tbody>
         </table>
         {modalIsOpen && (
@@ -157,7 +169,17 @@ const Employee = () => {
       )}
       <h1 id="tabelLabel">Employees</h1>
       <AddEmployee saveEmployee={saveEmployee} />
-      {contents}
+
+      {employees.length ? (
+        <>
+          <Search search={search} setSearch={setSearch} />
+          {contents}
+        </>
+      ) : (
+        <p style={{ textAlign: "center", color: "darkred" }}>
+          Your employee list is empty. Try to add some.
+        </p>
+      )}
     </div>
   );
 };

@@ -23,36 +23,54 @@ function EmployeeModal({
     if (employee) {
       setEmpId(employee.employeeId);
       setEmpName(employee.employeeName);
-      setDep(employee.department);
+      setDep(employee.department.departmentName);
       setJoinDate(employee.dateOfJoining.substr(0, 10));
-      setPhoto(employee.photoFilename);
+      setPhoto(employee.imageId);
     }
   }, []);
+
+  const getDepartmentId = (depName) => {
+    const tempDep = appContext.departments.filter(
+      (e) => e.departmentName === depName
+    );
+    return tempDep[0].departmentId;
+  };
+
+  const getImageId = (depName) => {
+    return appContext.departments.find((e) => e.departmentName === depName);
+  };
 
   function submitHandler(e) {
     e.preventDefault();
 
     const newEmployee = {
       employeeName: empName,
-      department: dep,
+      departmentId: dep,
       dateOfJoining: joinDate,
-      photoFilename: photo,
+      imageId: photo,
     };
 
     if (employee) {
       const editEmp = {
         employeeId: empId,
         employeeName: empName,
-        department: dep,
+        departmentId: getDepartmentId(dep),
         dateOfJoining: joinDate,
-        photoFilename: photo,
+        imageId: photo,
+        image: [{}],
+        department: [{}],
       };
+      console.log(editEmp);
       editEmployee(editEmp);
     } else {
       saveEmployee(newEmployee);
     }
     onConfirm();
   }
+
+  const open_file = () => {
+    document.getElementById("input_file").click();
+  };
 
   return (
     <form className="addForm" onSubmit={submitHandler}>
@@ -95,6 +113,7 @@ function EmployeeModal({
           <input
             id="joiningDate"
             type="date"
+            style={{ cursor: "pointer" }}
             placeholder="Joining Date"
             required
             value={joinDate}
@@ -103,14 +122,33 @@ function EmployeeModal({
         </div>
         <div className="ItemForm">
           <label htmlFor="photo">Photo Filename</label>
+
           <input
-            id="photo"
-            type="text"
-            placeholder="Photo Filename"
-            required
-            value={photo}
-            onChange={(e) => setPhoto(e.target.value)}
+            type="file"
+            id="input_file"
+            accept="image/*"
+            hidden
+            onChange={(e) =>
+              setPhoto(e.target.value.split("\\").pop().split("/").pop())
+            }
           ></input>
+
+          <div>
+            <button className="open-file-btn" onClick={open_file}>
+              Select Image
+            </button>
+
+            <input
+              className="filename-textbox"
+              type="text"
+              placeholder="Photo Filename"
+              readOnly="readonly"
+              value={photo}
+              onChange={(e) =>
+                setPhoto(e.target.value.split("\\").pop().split("/").pop())
+              }
+            ></input>
+          </div>
         </div>
 
         <button className="btn btn--alt" onClick={cancelHandler}>

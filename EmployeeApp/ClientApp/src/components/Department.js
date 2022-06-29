@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import AddDepartment from "./AddDepartment";
 import Modal from "./Modal";
 import Backdrop from "./Backdrop";
@@ -16,6 +16,13 @@ const Department = () => {
   const [alert, setAlert] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    showAlert &&
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 7000);
+  }, [showAlert]);
 
   function submitHandler() {
     setModalIsOpen(true);
@@ -131,7 +138,7 @@ const Department = () => {
   return (
     <div>
       {showAlert && (
-        <div class="alert alert-success" role="alert">
+        <div className="alert alert-success" role="alert">
           {alert}
           <ImCross
             onClick={handleRemove}

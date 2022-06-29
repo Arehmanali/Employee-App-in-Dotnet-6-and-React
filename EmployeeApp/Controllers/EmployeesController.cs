@@ -10,10 +10,12 @@ namespace EmployeeApp.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly DBContext _context;
+        private readonly IConfiguration _configuration;
 
-        public EmployeesController(DBContext context)
+        public EmployeesController(DBContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: api/Employees
@@ -25,7 +27,7 @@ namespace EmployeeApp.Controllers
                 return NotFound();
             }
 
-            return await _context.Employees.ToListAsync();
+            return await _context.Employees.Include(emp => emp.department).Include(emp => emp.image).ToListAsync();
         }
 
         // GET: api/Employees/5
@@ -56,8 +58,22 @@ namespace EmployeeApp.Controllers
                 return BadRequest();
             }
 
+            //emp = _context.Employees
+            //.Include(i => i.department)
+            //.Include(i => i.image)
+            //.Where(i => i.employeeId == id)
+            //.Single();
+
+            //newEmp.employeeName = emp.employeeName;
+            //newEmp.dateOfJoining = emp.dateOfJoining;
+            //newEmp.departmentId = emp.departmentId;
+            //newEmp.imageId = emp.imageId;
+            //newEmp.image = null;
+            //newEmp.department = null;
+
             _context.Entry(emp).State = EntityState.Modified;
 
+            // _context.Update(emp);
             try
             {
                 await _context.SaveChangesAsync();
@@ -77,15 +93,32 @@ namespace EmployeeApp.Controllers
             return NoContent();
         }
 
+        //public PostImage()
+        //{
+        //    string rootPath = @"ClientApp";
+        //    string filename = Path.GetFileNameWithoutExtension(emp.photoFilename);
+        //    string extension = Path.GetExtension(emp.photoFilename);
+        //    emp.photoFilename = filename + DateTime.Now.ToString("yymmssfff") + extension;
+        //    string path = Path.Combine(rootPath + "/image/", filename);
+
+        //    using (var fileStream = new FileStream(path, FileMode.Create))
+        //    {
+        //        await emp.imageFile.CopyToAsync(fileStream);
+        //    }
+        //}
+
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Employee>> PostEmployee(Employee emp)
         {
+            //Console.WriteLine("EMPLOYEE ++++++++++++++ " + emp);
             if (_context.Employees == null)
             {
                 return Problem("Entity set 'DBContext.Employees'  is null.");
             }
+            //var e = _context.Employees.Where(e => e.departmentId == _department.departmentId).Include(e => e.department).FirstOrDefault();
+            //Console.WriteLine("TESTING VAlue===" + e);
             _context.Employees.Add(emp);
             await _context.SaveChangesAsync();
 

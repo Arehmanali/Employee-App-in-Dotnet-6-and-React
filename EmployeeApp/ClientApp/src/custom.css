@@ -80,6 +80,18 @@ body {
   outline: none;
 }
 
+.addForm input[type="file"] {
+  flex-grow: 1;
+  width: 75%;
+  max-width: calc(100% - 50px);
+  min-height: 48px;
+  font-size: 1rem;
+  padding: 0.25rem;
+  margin-top: 20px;
+  border-radius: 0.25rem;
+  outline: none;
+}
+
 button {
   height: 48px;
   min-width: 48px;
@@ -87,15 +99,7 @@ button {
   padding: 0.5rem;
   font-size: 1rem;
   background-color: aliceblue;
-  color: mediumblue;
   cursor: pointer;
-}
-
-button:focus,
-button:hover {
-  color: white;
-  background-color: limegreen;
-  outline: none;
 }
 
 .searchForm {
@@ -222,4 +226,20 @@ h2 {
 .table svg:hover {
   color: red;
   outline: none;
+}
+
+.open-file-btn {
+  background-color: rgb(229, 226, 226);
+  color: black;
+  width: 26%;
+}
+
+.open-file-btn:hover {
+  background-color: gray;
+  color: white;
+}
+
+.filename-textbox {
+  width: 49% !important;
+  border: none;
 }

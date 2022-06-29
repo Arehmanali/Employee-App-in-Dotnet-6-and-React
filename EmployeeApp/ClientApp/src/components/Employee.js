@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link, Routes, Route } from "react-router-dom";
 import AddEmployee from "./AddEmployee";
 import EmployeeModal from "./EmployeeModal";
 import Backdrop from "./Backdrop";
@@ -8,7 +9,7 @@ import { ImCross } from "react-icons/im";
 import Search from "./Search";
 
 const Employee = () => {
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState({});
   const [employee, setEmployee] = useState({});
   const [addNew, setAddNew] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -26,15 +27,32 @@ const Employee = () => {
   }
 
   useEffect(() => {
+    showAlert &&
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 7000);
+  }, [showAlert]);
+
+  useEffect(() => {
     setLoading(true);
 
     fetch("employees")
       .then((response) => {
-        return response.json();
+        if (!response.ok) {
+          const error = response.status + ": " + response.statusText;
+          return Promise.reject(error);
+        } else {
+          return response.json();
+        }
       })
       .then((data) => {
         setLoading(false);
         setEmployees(data);
+      })
+      .catch((error) => {
+        setShowAlert(true);
+        setAlert(`Error: ${error}`);
+        console.error("There was an error!", error);
       });
   }, [addNew]);
 
@@ -69,11 +87,22 @@ const Employee = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(emp),
-    }).then(
-      () => setAddNew(!addNew),
-      setShowAlert(true),
-      setAlert("Employee edited successfully.")
-    );
+    })
+      .then((response) => {
+        setAddNew(!addNew);
+        if (response.ok) {
+          setShowAlert(true);
+          setAlert("Employee edited successfully.");
+        } else {
+          const error = response.status + ": " + response.statusText;
+          return Promise.reject(error);
+        }
+      })
+      .catch((error) => {
+        setShowAlert(true);
+        setAlert(`Error: ${error}`);
+        console.error("There was an error!", error);
+      });
   };
 
   const renderForecastsTable = (employees) => {
@@ -96,15 +125,16 @@ const Employee = () => {
                 (emp.employeeName
                   .toLowerCase()
                   .includes(search.toLowerCase()) ||
-                  emp.department
+                  emp.department.departmentName
                     .toLowerCase()
                     .includes(search.toLowerCase())) && (
                   <tr key={emp.employeeId}>
                     <td>{emp.employeeId}</td>
                     <td>{emp.employeeName}</td>
-                    <td>{emp.department}</td>
+                    <td>{emp.department.departmentName}</td>
                     <td>{emp.dateOfJoining.substr(0, 10)}</td>
-                    <td>{emp.photoFilename}</td>
+                    <td>{emp.image.imageName}</td>
+
                     <td>
                       <FiEdit
                         role="button"
@@ -118,6 +148,7 @@ const Employee = () => {
                         }}
                         tabIndex="0"
                       />
+
                       <FaTrashAlt
                         role="button"
                         onClick={() => {
@@ -158,15 +189,26 @@ const Employee = () => {
 
   return (
     <div>
-      {showAlert && (
-        <div class="alert alert-success" role="alert">
+      {alert.includes("200") && showAlert ? (
+        <div className="alert alert-success" role="alert">
           {alert}
           <ImCross
             onClick={handleRemove}
             style={{ float: "right", cursor: "pointer" }}
           />
         </div>
+      ) : (
+        showAlert && (
+          <div className="alert alert-danger" role="alert">
+            {alert}
+            <ImCross
+              onClick={handleRemove}
+              style={{ float: "right", cursor: "pointer" }}
+            />
+          </div>
+        )
       )}
+
       <h1 id="tabelLabel">Employees</h1>
       <AddEmployee saveEmployee={saveEmployee} />
 

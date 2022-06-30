@@ -9,16 +9,12 @@ namespace EmployeeApp.Models
         [Key]
         public int employeeId { get; set; }
         public string employeeName { get; set; }
-
-        [ForeignKey("departmentId")]
-        public int departmentId { get; set; }
         public DateTime dateOfJoining { get; set; }
+        public int? departmentId { get; set; }
+        public int? imageId { get; set; }
 
-        [ForeignKey("imageId")]
-        public int imageId { get; set; }
+        public ImageModel Image { get; set; }
 
-        public virtual Department department { get; set; }
-
-        public virtual ImageModel image { get; set; }
+        public Department Department { get; set; }
     }
 }

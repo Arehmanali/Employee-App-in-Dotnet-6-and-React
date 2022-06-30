@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useContext } from "react";
 import { Link, Routes, Route } from "react-router-dom";
 import AddEmployee from "./AddEmployee";
 import EmployeeModal from "./EmployeeModal";
@@ -7,8 +7,10 @@ import { FaTrashAlt } from "react-icons/fa";
 import { FiEdit } from "react-icons/fi";
 import { ImCross } from "react-icons/im";
 import Search from "./Search";
+import { AppContext } from "../store/app-context";
 
 const Employee = () => {
+  const appContext = useContext(AppContext);
   const [employees, setEmployees] = useState({});
   const [employee, setEmployee] = useState({});
   const [addNew, setAddNew] = useState(false);

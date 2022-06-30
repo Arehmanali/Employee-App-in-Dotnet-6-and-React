@@ -8,5 +8,7 @@ namespace EmployeeApp.Models
         public int imageId { get; set; }
         public string imageName { get; set; }
         //public byte[] imageData { get; set; }
+        public Employee Employee { get; set; }
+
     }
 }

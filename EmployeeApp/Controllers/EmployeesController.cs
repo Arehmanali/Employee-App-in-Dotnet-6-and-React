@@ -27,7 +27,7 @@ namespace EmployeeApp.Controllers
                 return NotFound();
             }
 
-            return await _context.Employees.Include(emp => emp.department).Include(emp => emp.image).ToListAsync();
+            return await _context.Employees.ToListAsync();
         }
 
         // GET: api/Employees/5
@@ -110,7 +110,7 @@ namespace EmployeeApp.Controllers
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee(Employee emp)
+        public async Task<ActionResult<Employee>> PostEmployee([Bind(include: "employeeName, departmentId, imageId, dateOfJoining")] Employee emp)
         {
             //Console.WriteLine("EMPLOYEE ++++++++++++++ " + emp);
             if (_context.Employees == null)

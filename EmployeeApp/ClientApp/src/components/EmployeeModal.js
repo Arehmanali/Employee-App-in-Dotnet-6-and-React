@@ -57,8 +57,6 @@ function EmployeeModal({
         departmentId: getDepartmentId(dep),
         dateOfJoining: joinDate,
         imageId: photo,
-        image: [{}],
-        department: [{}],
       };
       console.log(editEmp);
       editEmployee(editEmp);

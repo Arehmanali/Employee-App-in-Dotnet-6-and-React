@@ -28,6 +28,11 @@ const Employee = () => {
     setModalIsOpen(false);
   }
 
+  const getDepartmentName = (depId) => {
+    return appContext.departments.find((d) => d.departmentId === depId)
+      ?.departmentName;
+  };
+
   useEffect(() => {
     showAlert &&
       setTimeout(() => {
@@ -65,21 +70,43 @@ const Employee = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(newEmployee),
-    }).then(
-      () => setAddNew(!addNew),
-      setShowAlert(true),
-      setAlert("Employee added successfully.")
-    );
+    })
+      .then((response) => {
+        setAddNew(!addNew);
+        if (response.ok) {
+          setShowAlert(true);
+          setAlert("Employee Added successfully.");
+        } else {
+          const error = response.status + ": " + response.statusText;
+          return Promise.reject(error);
+        }
+      })
+      .catch((error) => {
+        setShowAlert(true);
+        setAlert(`Error: ${error}`);
+        console.error("There was an error!", error);
+      });
   };
 
   const handleDeleteBtn = (empId) => {
     fetch("employees/" + empId, {
       method: "DELETE",
-    }).then(
-      () => setAddNew(!addNew),
-      setShowAlert(true),
-      setAlert("Employee deleted successfully.")
-    );
+    })
+      .then((response) => {
+        setAddNew(!addNew);
+        if (response.ok) {
+          setShowAlert(true);
+          setAlert("Employee deleted successfully.");
+        } else {
+          const error = response.status + ": " + response.statusText;
+          return Promise.reject(error);
+        }
+      })
+      .catch((error) => {
+        setShowAlert(true);
+        setAlert(`Error: ${error}`);
+        console.error("There was an error!", error);
+      });
   };
 
   const editEmployee = (emp) => {
@@ -127,13 +154,13 @@ const Employee = () => {
                 (emp.employeeName
                   .toLowerCase()
                   .includes(search.toLowerCase()) ||
-                  emp.department.departmentName
+                  getDepartmentName(emp.departmentId)
                     .toLowerCase()
                     .includes(search.toLowerCase())) && (
                   <tr key={emp.employeeId}>
                     <td>{emp.employeeId}</td>
                     <td>{emp.employeeName}</td>
-                    <td>{emp.department.departmentName}</td>
+                    <td>{getDepartmentName(emp.departmentId)}</td>
                     <td>{emp.dateOfJoining.substr(0, 10)}</td>
                     <td>{emp.image.imageName}</td>
 
@@ -167,6 +194,7 @@ const Employee = () => {
         {modalIsOpen && (
           <EmployeeModal
             employee={employee}
+            getDepartmentName={getDepartmentName}
             saveEmployee={saveEmployee}
             editEmployee={editEmployee}
             onCancel={closeModalHandler}
@@ -177,7 +205,7 @@ const Employee = () => {
       </>
     );
   };
-  const handleRemove = () => {
+  const handleRemoveAlert = () => {
     setShowAlert(false);
   };
 
@@ -191,11 +219,12 @@ const Employee = () => {
 
   return (
     <div>
-      {alert.includes("200") && showAlert ? (
+      {alert.includes("200") ||
+      (alert.includes("successfully") && showAlert) ? (
         <div className="alert alert-success" role="alert">
           {alert}
           <ImCross
-            onClick={handleRemove}
+            onClick={handleRemoveAlert}
             style={{ float: "right", cursor: "pointer" }}
           />
         </div>
@@ -204,7 +233,7 @@ const Employee = () => {
           <div className="alert alert-danger" role="alert">
             {alert}
             <ImCross
-              onClick={handleRemove}
+              onClick={handleRemoveAlert}
               style={{ float: "right", cursor: "pointer" }}
             />
           </div>

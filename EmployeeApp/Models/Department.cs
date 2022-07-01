@@ -10,6 +10,5 @@ namespace EmployeeApp.Models
 
         //[NotMapped]
         //public int? employeeId { get; set; }
-        public ICollection<Employee> Employees { get; set; }
     }
 }

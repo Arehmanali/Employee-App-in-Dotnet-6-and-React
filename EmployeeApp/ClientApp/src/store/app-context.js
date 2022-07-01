@@ -17,28 +17,12 @@ function AppContextProvider(props) {
     setDepartments(data);
   };
 
-  const getDepartmentId = (depName) => {
-    const tempDep = departments.filter((e) => e.departmentName === depName);
-    return tempDep[0].departmentId;
-  };
-
-  const getDepartmentName = (depId) => {
-    const tempDep = departments.filter((e) => e.departmentId === depId);
-    return tempDep[0].departmentName;
-  };
-
-  const getImageId = (imageName) => {
-    return departments.find((e) => e.departmentName === imageName);
-  };
-
   const context = {
     getDepartments,
     departments,
     setDepartments,
     addNew,
     setAddNew,
-    getDepartmentId,
-    getDepartmentName,
   };
 
   return (

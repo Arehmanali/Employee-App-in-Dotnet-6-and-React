@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace EmployeeApp.Controllers
 {
@@ -27,7 +28,7 @@ namespace EmployeeApp.Controllers
                 return NotFound();
             }
 
-            return await _context.Employees.ToListAsync();
+            return await _context.Employees.Include(e => e.Image).ToListAsync(); ;
         }
 
         // GET: api/Employees/5
@@ -38,7 +39,8 @@ namespace EmployeeApp.Controllers
             {
                 return NotFound();
             }
-            var employee = await _context.Employees.FindAsync(id);
+
+            var employee = await _context.Employees.Include(e => e.Image).FirstOrDefaultAsync(i => i.employeeId == id);
 
             if (employee == null)
             {
@@ -70,10 +72,12 @@ namespace EmployeeApp.Controllers
             //newEmp.imageId = emp.imageId;
             //newEmp.image = null;
             //newEmp.department = null;
+            //var empToUpdate = await _context.Employees.FirstOrDefaultAsync(s => s.employeeId == id);
 
-            _context.Entry(emp).State = EntityState.Modified;
 
-            // _context.Update(emp);
+            //_context.Entry(emp).State = EntityState.Modified;
+
+            _context.Update(emp);
             try
             {
                 await _context.SaveChangesAsync();
@@ -91,6 +95,7 @@ namespace EmployeeApp.Controllers
             }
 
             return NoContent();
+
         }
 
         //public PostImage()
@@ -110,7 +115,7 @@ namespace EmployeeApp.Controllers
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee([Bind(include: "employeeName, departmentId, imageId, dateOfJoining")] Employee emp)
+        public async Task<ActionResult<Employee>> PostEmployee([Bind("employeeName, departmentId, imageId, dateOfJoining")] Employee emp)
         {
             //Console.WriteLine("EMPLOYEE ++++++++++++++ " + emp);
             if (_context.Employees == null)
@@ -133,28 +138,19 @@ namespace EmployeeApp.Controllers
             {
                 return NotFound();
             }
-            var emp = await _context.Employees.FindAsync(id);
+            var emp = await _context.Employees.Include(e => e.Image).FirstOrDefaultAsync(i => i.employeeId == id);
+
             if (emp == null)
             {
                 return NotFound();
             }
 
+            ImageModel? img = await _context.Images.FindAsync(emp.Image.imageId);
+            _context.Images.Remove(img);
             _context.Employees.Remove(emp);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        [Route("getDepartments")]
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
-        {
-            if (_context.Departments == null)
-            {
-                return NotFound();
-            }
-
-            return await _context.Departments.ToListAsync();
         }
 
         private bool EmployeeExists(int id)

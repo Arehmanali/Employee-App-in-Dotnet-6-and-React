@@ -5,7 +5,7 @@ const Home = () => {
   return (
     <div>
       <h1 style={{ textAlign: "center" }}>Welcome to Employee App</h1>
-      <Employee />
+      {/* <Employee /> */}
       <Department />
     </div>
   );

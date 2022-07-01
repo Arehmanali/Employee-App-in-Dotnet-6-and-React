@@ -7,6 +7,7 @@ function EmployeeModal({
   saveEmployee,
   employee,
   editEmployee,
+  getDepartmentName,
 }) {
   const appContext = useContext(AppContext);
   const [empId, setEmpId] = useState("");
@@ -23,31 +24,26 @@ function EmployeeModal({
     if (employee) {
       setEmpId(employee.employeeId);
       setEmpName(employee.employeeName);
-      setDep(employee.department.departmentName);
+      setDep(getDepartmentName(employee.departmentId));
       setJoinDate(employee.dateOfJoining.substr(0, 10));
-      setPhoto(employee.imageId);
+      setPhoto(employee.image.imageName);
     }
   }, []);
 
   const getDepartmentId = (depName) => {
-    const tempDep = appContext.departments.filter(
-      (e) => e.departmentName === depName
-    );
-    return tempDep[0].departmentId;
+    return appContext.departments.find((d) => d.departmentName === depName)
+      ?.departmentId;
   };
-
-  const getImageId = (depName) => {
-    return appContext.departments.find((e) => e.departmentName === depName);
-  };
-
   function submitHandler(e) {
     e.preventDefault();
 
     const newEmployee = {
       employeeName: empName,
-      departmentId: dep,
+      departmentId: getDepartmentId(dep),
       dateOfJoining: joinDate,
-      imageId: photo,
+      image: {
+        imageName: photo,
+      },
     };
 
     if (employee) {
@@ -56,7 +52,10 @@ function EmployeeModal({
         employeeName: empName,
         departmentId: getDepartmentId(dep),
         dateOfJoining: joinDate,
-        imageId: photo,
+        image: {
+          imageId: employee.image.imageId,
+          imageName: photo,
+        },
       };
       console.log(editEmp);
       editEmployee(editEmp);
@@ -66,7 +65,8 @@ function EmployeeModal({
     onConfirm();
   }
 
-  const open_file = () => {
+  const open_file = (e) => {
+    e.preventDefault();
     document.getElementById("input_file").click();
   };
 
@@ -99,8 +99,8 @@ function EmployeeModal({
             <option value="Select Department">Select Department</option>
             {appContext.departments.map((dept) => {
               return (
-                <option value={dept.departmentName}>
-                  {dept.departmentName}
+                <option value={dept?.departmentName}>
+                  {dept?.departmentName}
                 </option>
               );
             })}
@@ -126,9 +126,10 @@ function EmployeeModal({
             id="input_file"
             accept="image/*"
             hidden
-            onChange={(e) =>
-              setPhoto(e.target.value.split("\\").pop().split("/").pop())
-            }
+            onChange={(e) => {
+              e.preventDefault();
+              setPhoto(e.target.value.split("\\").pop().split("/").pop());
+            }}
           ></input>
 
           <div>

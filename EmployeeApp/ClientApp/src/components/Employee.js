@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback, useContext } from "react";
-import { Link, Routes, Route } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
 import AddEmployee from "./AddEmployee";
 import EmployeeModal from "./EmployeeModal";
 import Backdrop from "./Backdrop";
@@ -8,6 +7,7 @@ import { FiEdit } from "react-icons/fi";
 import { ImCross } from "react-icons/im";
 import Search from "./Search";
 import { AppContext } from "../store/app-context";
+import axios from "axios";
 
 const Employee = () => {
   const appContext = useContext(AppContext);
@@ -62,6 +62,15 @@ const Employee = () => {
         console.error("There was an error!", error);
       });
   }, [addNew]);
+
+  const AddEmployee = async (formData) => {
+    try {
+      const res = await axios.post("employees", formData);
+      console.log(res);
+    } catch (ex) {
+      console.log(ex);
+    }
+  };
 
   const saveEmployee = (newEmployee) => {
     fetch("employees", {
@@ -219,7 +228,7 @@ const Employee = () => {
 
   return (
     <div>
-      {alert.includes("200") ||
+      {alert.includes("201") ||
       (alert.includes("successfully") && showAlert) ? (
         <div className="alert alert-success" role="alert">
           {alert}
@@ -241,7 +250,7 @@ const Employee = () => {
       )}
 
       <h1 id="tabelLabel">Employees</h1>
-      <AddEmployee saveEmployee={saveEmployee} />
+      <AddEmployee saveEmployee={saveEmployee} AddEmployee={AddEmployee} />
 
       {employees.length ? (
         <>

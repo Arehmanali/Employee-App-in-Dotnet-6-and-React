@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EmployeeApp.Models
 {
@@ -7,7 +8,9 @@ namespace EmployeeApp.Models
         [Key]
         public int imageId { get; set; }
         public string imageName { get; set; }
-        //public byte[] imageData { get; set; }
+
+        [NotMapped]
+        public IFormFile imageFile { get; set; }
 
     }
 }

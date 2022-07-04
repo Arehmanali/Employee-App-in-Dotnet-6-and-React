@@ -1,10 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../store/app-context";
+import AddEmployee from "./AddEmployee";
 
 function EmployeeModal({
   onConfirm,
   onCancel,
   saveEmployee,
+  AddEmployee,
   employee,
   editEmployee,
   getDepartmentName,
@@ -15,6 +17,8 @@ function EmployeeModal({
   const [dep, setDep] = useState("");
   const [joinDate, setJoinDate] = useState("");
   const [photo, setPhoto] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imageSource, setImageSource] = useState("/image/149071.png");
 
   function cancelHandler() {
     onCancel();
@@ -37,14 +41,23 @@ function EmployeeModal({
   function submitHandler(e) {
     e.preventDefault();
 
-    const newEmployee = {
-      employeeName: empName,
-      departmentId: getDepartmentId(dep),
-      dateOfJoining: joinDate,
-      image: {
-        imageName: photo,
-      },
-    };
+    console.log(imageFile);
+    const formData = new FormData();
+    formData.append("employeeName", empName);
+    formData.append("departmentId", getDepartmentId(dep));
+    formData.append("dateOfJoining", joinDate);
+    formData.append("image.imageName", photo);
+    formData.append("image.imageFile", imageFile);
+
+    // const newEmployee = {
+    //   employeeName: empName,
+    //   departmentId: getDepartmentId(dep),
+    //   dateOfJoining: joinDate,
+    //   image: {
+    //     imageName: photo,
+    //     imageFile: imageFile,
+    //   },
+    // };
 
     if (employee) {
       const editEmp = {
@@ -55,12 +68,14 @@ function EmployeeModal({
         image: {
           imageId: employee.image.imageId,
           imageName: photo,
+          imageFile: imageFile,
         },
       };
       console.log(editEmp);
       editEmployee(editEmp);
     } else {
-      saveEmployee(newEmployee);
+      console.log(formData);
+      AddEmployee(formData);
     }
     onConfirm();
   }
@@ -70,83 +85,114 @@ function EmployeeModal({
     document.getElementById("input_file").click();
   };
 
+  const showReview = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      let imageFile = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (x) => {
+        setImageSource(x.target.result);
+        setImageFile(imageFile);
+      };
+      reader.readAsDataURL(imageFile);
+    }
+  };
+
   return (
     <form className="addForm" onSubmit={submitHandler}>
       <div className="modal2">
         <h1>Add New Employee</h1>
+        <div className="container">
+          <div className="row">
+            <div className="col">
+              <div className="ItemForm">
+                <label htmlFor="employeeName">Employee Name</label>
+                <input
+                  autoFocus
+                  id="employeeName"
+                  type="text"
+                  placeholder="Employee Name"
+                  required
+                  value={empName}
+                  onChange={(e) => setEmpName(e.target.value)}
+                ></input>
+              </div>
 
-        <div className="ItemForm">
-          <label htmlFor="employeeName">Employee Name</label>
-          <input
-            autoFocus
-            id="employeeName"
-            type="text"
-            placeholder="Employee Name"
-            required
-            value={empName}
-            onChange={(e) => setEmpName(e.target.value)}
-          ></input>
-        </div>
+              <div className="ItemForm">
+                <label htmlFor="department">Department</label>
+                <select
+                  style={{ cursor: "pointer" }}
+                  className="dropdown"
+                  value={dep}
+                  onChange={(e) => setDep(e.target.value)}
+                >
+                  <option value="Select Department">Select Department</option>
+                  {appContext.departments.map((dept) => {
+                    return (
+                      <option value={dept?.departmentName}>
+                        {dept?.departmentName}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <div className="ItemForm">
+                <label htmlFor="joiningDate">Joining Date</label>
+                <input
+                  id="joiningDate"
+                  type="date"
+                  placeholder="Joining Date"
+                  required
+                  value={joinDate}
+                  onChange={(e) => setJoinDate(e.target.value)}
+                ></input>
+              </div>
+            </div>
+            <div className="col">
+              <img
+                src={imageSource}
+                className="card-img-top"
+                alt="employee Image"
+                style={{
+                  width: "10rem",
+                  height: "10rem",
+                  borderRadius: "80px",
+                }}
+              />
 
-        <div className="ItemForm">
-          <label htmlFor="department">Department</label>
-          <select
-            style={{ cursor: "pointer" }}
-            className="dropdown"
-            value={dep}
-            onChange={(e) => setDep(e.target.value)}
-          >
-            <option value="Select Department">Select Department</option>
-            {appContext.departments.map((dept) => {
-              return (
-                <option value={dept?.departmentName}>
-                  {dept?.departmentName}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-        <div className="ItemForm">
-          <label htmlFor="joiningDate">Joining Date</label>
-          <input
-            id="joiningDate"
-            type="date"
-            style={{ cursor: "pointer" }}
-            placeholder="Joining Date"
-            required
-            value={joinDate}
-            onChange={(e) => setJoinDate(e.target.value)}
-          ></input>
-        </div>
-        <div className="ItemForm">
-          <label htmlFor="photo">Photo Filename</label>
+              <div className="ItemForm">
+                <label htmlFor="photo">Photo Filename</label>
 
-          <input
-            type="file"
-            id="input_file"
-            accept="image/*"
-            hidden
-            onChange={(e) => {
-              e.preventDefault();
-              setPhoto(e.target.value.split("\\").pop().split("/").pop());
-            }}
-          ></input>
+                <input
+                  type="file"
+                  id="input_file"
+                  accept="image/*"
+                  hidden
+                  onChange={(e) => {
+                    showReview(e);
+                    setPhoto(e.target.value.split("\\").pop().split("/").pop());
+                  }}
+                ></input>
 
-          <div>
-            <button className="open-file-btn" onClick={open_file}>
-              Select Image
-            </button>
+                <div>
+                  <button className="open-file-btn" onClick={open_file}>
+                    Select Image
+                  </button>
 
-            <input
-              className="filename-textbox"
-              type="text"
-              placeholder="Photo Filename"
-              readOnly="readonly"
-              value={photo}
-              onChange={(e) =>
-                setPhoto(e.target.value.split("\\").pop().split("/").pop())
-              }
-            ></input>
+                  <input
+                    className="filename-textbox"
+                    type="text"
+                    placeholder="Photo Filename"
+                    readOnly="readonly"
+                    value={photo}
+                    onChange={(e) =>
+                      setPhoto(
+                        e.target.value.split("\\").pop().split("/").pop()
+                      )
+                    }
+                  ></input>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

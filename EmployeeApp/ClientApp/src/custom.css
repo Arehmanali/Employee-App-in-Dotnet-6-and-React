@@ -80,6 +80,10 @@ body {
   outline: none;
 }
 
+.addForm input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
 .addForm input[type="file"] {
   flex-grow: 1;
   width: 75%;
@@ -192,11 +196,11 @@ h2 {
   background-color: white;
   padding: 1rem;
   text-align: center;
-  width: 30rem;
+  width: 50rem;
   z-index: 10;
   position: fixed;
   top: 20vh;
-  left: calc(50% - 15rem);
+  left: calc(50% - 25rem);
 }
 
 .backdrop {
@@ -231,7 +235,7 @@ h2 {
 .open-file-btn {
   background-color: rgb(229, 226, 226);
   color: black;
-  width: 26%;
+  width: 36%;
 }
 
 .open-file-btn:hover {

@@ -1,8 +1,6 @@
 ﻿using EmployeeApp.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace EmployeeApp.Controllers
 {
@@ -12,11 +10,13 @@ namespace EmployeeApp.Controllers
     {
         private readonly DBContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public EmployeesController(DBContext context, IConfiguration configuration)
+        public EmployeesController(DBContext context, IConfiguration configuration, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
             _configuration = configuration;
+            _hostEnvironment = hostEnvironment;
         }
 
         // GET: api/Employees
@@ -60,23 +60,6 @@ namespace EmployeeApp.Controllers
                 return BadRequest();
             }
 
-            //emp = _context.Employees
-            //.Include(i => i.department)
-            //.Include(i => i.image)
-            //.Where(i => i.employeeId == id)
-            //.Single();
-
-            //newEmp.employeeName = emp.employeeName;
-            //newEmp.dateOfJoining = emp.dateOfJoining;
-            //newEmp.departmentId = emp.departmentId;
-            //newEmp.imageId = emp.imageId;
-            //newEmp.image = null;
-            //newEmp.department = null;
-            //var empToUpdate = await _context.Employees.FirstOrDefaultAsync(s => s.employeeId == id);
-
-
-            //_context.Entry(emp).State = EntityState.Modified;
-
             _context.Update(emp);
             try
             {
@@ -115,19 +98,19 @@ namespace EmployeeApp.Controllers
         // POST: api/Employees
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Employee>> PostEmployee([Bind("employeeName, departmentId, imageId, dateOfJoining")] Employee emp)
+        public async Task<ActionResult<Employee>> PostEmployee([FromForm] Employee emp)
         {
-            //Console.WriteLine("EMPLOYEE ++++++++++++++ " + emp);
             if (_context.Employees == null)
             {
                 return Problem("Entity set 'DBContext.Employees'  is null.");
             }
-            //var e = _context.Employees.Where(e => e.departmentId == _department.departmentId).Include(e => e.department).FirstOrDefault();
-            //Console.WriteLine("TESTING VAlue===" + e);
+
+            emp.Image.imageName = await SaveImage(emp.Image.imageFile);
+
             _context.Employees.Add(emp);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetEmployee), new { id = emp.employeeId }, emp);
+            return StatusCode(201);
         }
 
         // DELETE: api/Employees/5
@@ -156,6 +139,19 @@ namespace EmployeeApp.Controllers
         private bool EmployeeExists(int id)
         {
             return (_context.Employees?.Any(e => e.employeeId == id)).GetValueOrDefault();
+        }
+
+        [NonAction]
+        public async Task<string> SaveImage(IFormFile imageFile)
+        {
+            string imageName = new string(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(" ", "-");
+            imageName = imageName + DateTime.Now.ToString("yymmssff") + Path.GetExtension(imageFile.FileName);
+            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images", imageName);
+            using (var fileStream = new FileStream(imagePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+            return imageName;
         }
     }
 }

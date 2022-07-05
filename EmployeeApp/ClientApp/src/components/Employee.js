@@ -7,11 +7,10 @@ import { FiEdit } from "react-icons/fi";
 import { ImCross } from "react-icons/im";
 import Search from "./Search";
 import { AppContext } from "../store/app-context";
-import axios from "axios";
 
 const Employee = () => {
   const appContext = useContext(AppContext);
-  const [employees, setEmployees] = useState({});
+  const [employees, setEmployees] = useState([]);
   const [employee, setEmployee] = useState({});
   const [addNew, setAddNew] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -63,22 +62,13 @@ const Employee = () => {
       });
   }, [addNew]);
 
-  const AddEmployee = async (formData) => {
-    try {
-      const res = await axios.post("employees", formData);
-      console.log(res);
-    } catch (ex) {
-      console.log(ex);
-    }
-  };
-
   const saveEmployee = (newEmployee) => {
     fetch("employees", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        Accept: "application/form-data",
       },
-      body: JSON.stringify(newEmployee),
+      body: newEmployee,
     })
       .then((response) => {
         setAddNew(!addNew);
@@ -119,12 +109,13 @@ const Employee = () => {
   };
 
   const editEmployee = (emp) => {
-    fetch("employees/" + emp.employeeId, {
+    console.log(Object.fromEntries(emp));
+    fetch("employees/" + emp.get("employeeId"), {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json",
+        Accept: "application/form-data",
       },
-      body: JSON.stringify(emp),
+      body: emp,
     })
       .then((response) => {
         setAddNew(!addNew);
@@ -171,7 +162,16 @@ const Employee = () => {
                     <td>{emp.employeeName}</td>
                     <td>{getDepartmentName(emp.departmentId)}</td>
                     <td>{emp.dateOfJoining.substr(0, 10)}</td>
-                    <td>{emp.image.imageName}</td>
+                    <td>
+                      <img
+                        src={emp.image.imageSource}
+                        style={{
+                          borderRadius: "50px",
+                          width: "50px",
+                          height: "50px",
+                        }}
+                      ></img>
+                    </td>
 
                     <td>
                       <FiEdit
@@ -250,7 +250,7 @@ const Employee = () => {
       )}
 
       <h1 id="tabelLabel">Employees</h1>
-      <AddEmployee saveEmployee={saveEmployee} AddEmployee={AddEmployee} />
+      <AddEmployee saveEmployee={saveEmployee} />
 
       {employees.length ? (
         <>

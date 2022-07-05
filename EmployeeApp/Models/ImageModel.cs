@@ -11,6 +11,8 @@ namespace EmployeeApp.Models
 
         [NotMapped]
         public IFormFile imageFile { get; set; }
+        [NotMapped]
+        public string imageSource { get; set; }
 
     }
 }

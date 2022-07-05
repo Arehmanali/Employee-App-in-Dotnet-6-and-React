@@ -1,12 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../store/app-context";
-import AddEmployee from "./AddEmployee";
 
 function EmployeeModal({
   onConfirm,
   onCancel,
   saveEmployee,
-  AddEmployee,
   employee,
   editEmployee,
   getDepartmentName,
@@ -31,6 +29,7 @@ function EmployeeModal({
       setDep(getDepartmentName(employee.departmentId));
       setJoinDate(employee.dateOfJoining.substr(0, 10));
       setPhoto(employee.image.imageName);
+      setImageSource(employee.image.imageSource);
     }
   }, []);
 
@@ -41,41 +40,20 @@ function EmployeeModal({
   function submitHandler(e) {
     e.preventDefault();
 
-    console.log(imageFile);
     const formData = new FormData();
     formData.append("employeeName", empName);
     formData.append("departmentId", getDepartmentId(dep));
     formData.append("dateOfJoining", joinDate);
     formData.append("image.imageName", photo);
+    formData.append("image.imageSource", imageSource);
     formData.append("image.imageFile", imageFile);
 
-    // const newEmployee = {
-    //   employeeName: empName,
-    //   departmentId: getDepartmentId(dep),
-    //   dateOfJoining: joinDate,
-    //   image: {
-    //     imageName: photo,
-    //     imageFile: imageFile,
-    //   },
-    // };
-
     if (employee) {
-      const editEmp = {
-        employeeId: empId,
-        employeeName: empName,
-        departmentId: getDepartmentId(dep),
-        dateOfJoining: joinDate,
-        image: {
-          imageId: employee.image.imageId,
-          imageName: photo,
-          imageFile: imageFile,
-        },
-      };
-      console.log(editEmp);
-      editEmployee(editEmp);
+      formData.append("employeeId", empId);
+      formData.append("image.imageId", employee.image.imageId);
+      editEmployee(formData);
     } else {
-      console.log(formData);
-      AddEmployee(formData);
+      saveEmployee(formData);
     }
     onConfirm();
   }
@@ -91,7 +69,6 @@ function EmployeeModal({
       const reader = new FileReader();
       reader.onload = (x) => {
         setImageSource(x.target.result);
-        setImageFile(imageFile);
       };
       reader.readAsDataURL(imageFile);
     }
@@ -169,6 +146,7 @@ function EmployeeModal({
                   hidden
                   onChange={(e) => {
                     showReview(e);
+                    setImageFile(e.target.files[0]);
                     setPhoto(e.target.value.split("\\").pop().split("/").pop());
                   }}
                 ></input>

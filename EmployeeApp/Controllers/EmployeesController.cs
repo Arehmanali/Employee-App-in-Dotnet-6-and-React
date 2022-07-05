@@ -1,6 +1,7 @@
 ﻿using EmployeeApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace EmployeeApp.Controllers
 {
@@ -10,7 +11,7 @@ namespace EmployeeApp.Controllers
     {
         private readonly DBContext _context;
         private readonly IConfiguration _configuration;
-        private readonly IWebHostEnvironment _hostEnvironment;
+        private static IWebHostEnvironment _hostEnvironment;
 
         public EmployeesController(DBContext context, IConfiguration configuration, IWebHostEnvironment hostEnvironment)
         {
@@ -21,14 +22,26 @@ namespace EmployeeApp.Controllers
 
         // GET: api/Employees
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<Employee>>?> GetEmployees()
         {
             if (_context.Employees == null)
             {
                 return NotFound();
             }
-
-            return await _context.Employees.Include(e => e.Image).ToListAsync(); ;
+            return await _context.Employees.Include(e => e.Image).Select(e => new Employee()
+            {
+                employeeId = e.employeeId,
+                employeeName = e.employeeName,
+                departmentId = e.departmentId,
+                dateOfJoining = e.dateOfJoining,
+                Image = new ImageModel()
+                {
+                    imageId = e.Image.imageId,
+                    imageName = e.Image.imageName,
+                    imageFile = e.Image.imageFile,
+                    imageSource = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, e.Image.imageName),
+                }
+            }).ToListAsync();
         }
 
         // GET: api/Employees/5
@@ -40,7 +53,20 @@ namespace EmployeeApp.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees.Include(e => e.Image).FirstOrDefaultAsync(i => i.employeeId == id);
+            var employee = await _context.Employees.Include(e => e.Image).Select(e => new Employee()
+            {
+                employeeId = e.employeeId,
+                employeeName = e.employeeName,
+                departmentId = e.departmentId,
+                dateOfJoining = e.dateOfJoining,
+                Image = new ImageModel()
+                {
+                    imageId = e.Image.imageId,
+                    imageName = e.Image.imageName,
+                    imageFile = e.Image.imageFile,
+                    imageSource = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, e.Image.imageName),
+                }
+            }).FirstOrDefaultAsync(i => i.employeeId == id);
 
             if (employee == null)
             {
@@ -53,14 +79,21 @@ namespace EmployeeApp.Controllers
         // PUT: api/Employees/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(int id, Employee emp)
+        public async Task<IActionResult> PutEmployee(int id, [FromForm] Employee emp)
         {
             if (id != emp.employeeId)
             {
                 return BadRequest();
             }
 
+            if (emp.Image.imageFile != null)
+            {
+                DeleteImage(emp.Image.imageName);
+                emp.Image.imageName = await SaveImage(emp.Image.imageFile);
+            }
+
             _context.Update(emp);
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -106,7 +139,6 @@ namespace EmployeeApp.Controllers
             }
 
             emp.Image.imageName = await SaveImage(emp.Image.imageFile);
-
             _context.Employees.Add(emp);
             await _context.SaveChangesAsync();
 
@@ -128,6 +160,7 @@ namespace EmployeeApp.Controllers
                 return NotFound();
             }
 
+            DeleteImage(emp.Image.imageName);
             ImageModel? img = await _context.Images.FindAsync(emp.Image.imageId);
             _context.Images.Remove(img);
             _context.Employees.Remove(emp);
@@ -153,5 +186,20 @@ namespace EmployeeApp.Controllers
             }
             return imageName;
         }
+
+        [NonAction]
+        public void DeleteImage(string imageName)
+        {
+            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images", imageName);
+            if (System.IO.File.Exists(imagePath)) System.IO.File.Delete(imagePath);
+        }
+
+
+        //public static IFormFile GetImage(string imgName)
+        //{
+        //    Byte[] b;
+        //    b = System.IO.File.ReadAllBytes("~/Images/" + imgName);
+        //    return (IFormFile)File(b, "image/*");
+        //}
     }
 }
